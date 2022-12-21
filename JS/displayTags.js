@@ -17,7 +17,7 @@ export var tagsArray = [
 // LISTENNER DES TAGS
 const listenToTags = function (data) {
   document.querySelectorAll(".tags__close").forEach((X) => {
-    console.log(tagsArray.length);
+    // console.log(tagsArray.length);
     X.addEventListener("click", tagIsNone);
   });
 };
@@ -43,7 +43,7 @@ const tagIsNone = (e) => {
       let distinctFilteredRecipes = deleteDuplicatesGoogled(
         theMillTurns(tagReload[0], item.title)
       );
-      console.log(distinctFilteredRecipes);
+      // console.log(distinctFilteredRecipes);
       tagReload[0] = [...distinctFilteredRecipes];
     });
     isFilterReload(tagReload[0]);

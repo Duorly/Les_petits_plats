@@ -1,129 +1,64 @@
-// console.log("%c openCloseFilters.js", "color: green; font-weight:bold;");
+// console.log("%c utils.js", "color: green; font-weight:bold;");
 
+import { DISPLAY_FILTERS } from "./displayFilters.js";
+import { GET_RECIPES_HYDRATE } from "../index.js";
 import { renderRecipes } from "./api.js";
-import * as filters from "./displayFilters.js";
 
-// fonction globale
-// permet d'ouvrir et de fermer les filtres / btn
-export const isFiltersInteractive =
-  (renderRecipes.prototype.isFiltersInteractive = (btn, buttonValue) => {
-    // composant liste de mots clés
-    const displayKeyword = btn.nextElementSibling;
-    if (displayKeyword.classList.contains("filter__show")) {
-      closeSelectFilter(
-        // supprime le placeholder, attribue une value, attribue un type button
-        displayKeyword.previousElementSibling,
-        // supprime la class CSS assurant l'affichange
-        displayKeyword,
-        // réduit la largeur du composant
-        displayKeyword.parentNode,
-        // assure la rotation de la flèche vers le haut
-        displayKeyword.parentNode.firstElementChild
-      );
-    } else {
-      // vérifie si les filtres sont ouverts ailleurs pour les fermer
-      isFilterClosed();
-      // ouvre le filtre sélectionné
-      changeInputTypeInText(btn, buttonValue);
-    }
+// MELANGER LES ELEMENTS D'UN TABLEAU
+export const shuffle = (array) => {
+  let currentIndex = array.length,
+    randomIndex;
+
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+
+  return array;
+};
+
+// SUPPRIMER LES DOUBLONS D'UN TABLEAU
+export const deleteDuplicates = (array) => {
+  let cleanDuplicate = [];
+  array.forEach((item) => {
+    cleanDuplicate.indexOf(item) == -1 ? cleanDuplicate.push(item) : "";
+    return cleanDuplicate;
   });
+};
 
-// ferme le menu sélectionné
-export const closeSelectFilter = (renderRecipes.prototype.closeSelectFilter = (
-  inputBtn,
-  filterShow,
-  parentWidth,
-  rotateArrow
-) => {
-  inputBtn.setAttribute("type", "button");
-  inputBtn.setAttribute("value", `${inputBtn.getAttribute("data-value")}`);
-  inputBtn.removeAttribute("placeholder");
-  filterShow.classList.remove("filter__show");
-  parentWidth.style.width = "170px";
-  rotateArrow.classList.remove("filter__custom-arrow--rotate");
-});
+// METTRE LA PREMIERE LETTRE EN LETTRE CAPITALE
+export const capitalize = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
-// vérifie si les filtres sont ouverts ailleurs pour les fermer
-export const isFilterClosed = (renderRecipes.prototype.isFilterClosed = () => {
-  document.querySelectorAll(".filter__custom-menu").forEach((filter) => {
-    if (filter.classList.contains("filter__show")) {
-      closeSelectFilter(
-        // supprime le placeholder, attribue une value, attribue un type button
-        filter.previousElementSibling,
-        // supprime la class CSS assurant l'affichage
-        filter,
-        // réduit la largeur du composant
-        filter.parentNode,
-        // assure la rotation de la flèche vers le haut
-        filter.parentNode.firstElementChild
-      );
-    }
+// RELOAD window.location.reload
+export const windowLocationReload = () => {
+  // window.location.reload();
+
+};
+
+// CLOSE TAGS
+export const tagIsNoneSuccess = () => {
+  document.getElementsByClassName("tags__item--success").style.display = "none";
+};
+export const tagIsNoneDanger = () => {
+  document.getElementsByClassName("tags__item--danger").style.display = "none";
+};
+export const tagIsNonePrimary = () => {
+  document.getElementsByClassName("tags__item--primary").style.display = "none";
+};
+
+export const deleteDuplicatesGoogled = (array) => {
+  let cleanDuplicate = [];
+  array.forEach((item) => {
+    // console.log(item.id);
+    cleanDuplicate.indexOf(item) == -1 ? cleanDuplicate.push(item) : "";
   });
-});
-
-// FERME LE FILTRE ET CHARGE NOUVEAUX ELEMENTS
-export const isFilterReload = (renderRecipes.prototype.isFilterClosed = (
-  data
-) => {
-  document.querySelectorAll(".filter__custom-menu").forEach((filter) => {
-    if (filter.classList.contains("filter__show")) {
-      let btn = filter.previousElementSibling;
-      let btnvalue = btn.getAttribute("value");
-      // console.log(btn, btnvalue);
-
-      // SUPPRESSION DES PRECEDENTES UL CONTENANT LES LI
-      document.querySelectorAll(".filter__custom-menu").forEach((ul) => {
-        // console.log(ul);
-        ul.remove();
-      });
-      // HYDRATE LES LI AVEC LA NOUVELLE RECHERCHE
-      filters.DISPLAY_FILTERS(data);
-      // OUVRE A NOUVEAU L'INPUT EN MODE TEXTE
-      changeInputTypeInText(btn, btnvalue);
-    }
-  });
-});
-
-export const changeInputTypeInText =
-  (renderRecipes.prototype.changeInputTypeInText = (button, buttonValue) => {
-    button.setAttribute("type", "text");
-    button.setAttribute("data-value", `${buttonValue}`);
-    // button.removeAttribute("value");
-    button.value = "";
-
-    switch (buttonValue) {
-      case "Appareil":
-        // élargie le button type texte
-        button.parentNode.style.width = "66%";
-        // set un placeholder
-        button.setAttribute("placeholder", "Recherche un appareil");
-        // affiche la liste
-        button.nextElementSibling.classList.add("filter__show");
-        // rotate de la fleche
-        button.previousElementSibling.classList.add(
-          "filter__custom-arrow--rotate"
-        );
-
-        break;
-      case "Ingrédients":
-        button.parentNode.style.width = "66%";
-        button.setAttribute("placeholder", "Recherche un ingrédient");
-        button.nextElementSibling.classList.add("filter__show");
-        button.previousElementSibling.classList.add(
-          "filter__custom-arrow--rotate"
-        );
-
-        break;
-      case "Ustensiles":
-        button.parentNode.style.width = "66%";
-        button.setAttribute("placeholder", "Recherche un ustensile");
-        button.nextElementSibling.classList.add("filter__show");
-        button.previousElementSibling.classList.add(
-          "filter__custom-arrow--rotate"
-        );
-
-        break;
-      default:
-        break;
-    }
-  });
+  // console.log(cleanDuplicate);
+  return cleanDuplicate;
+};

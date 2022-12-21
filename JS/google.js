@@ -1,127 +1,129 @@
-// console.log("%c google.js", "color: green; font-weight:bold;");
+// console.log("%c openCloseFilters.js", "color: green; font-weight:bold;");
 
-import * as cards from "./displayCards.js";
+import { renderRecipes } from "./api.js";
 import * as filters from "./displayFilters.js";
-import { showListOfTags, tagsArray } from "./displayTags.js";
-import { isFilterReload } from "./openCloseFilters.js";
-import { deleteDuplicatesGoogled } from "./utils.js";
 
-export let theMillTurns = (recipes, filter) => {
-  //   console.log(recipes, filter);
-  let googledCards = [];
-
-  for (let recipe of recipes) {
-    // console.log(recipe);
-    if (
-      // une recette ?
-      recipe.name.toLowerCase().trim().indexOf(filter.toLowerCase().trim()) >
-        -1 ||
-      recipe.description
-        .toLowerCase()
-        .trim()
-        .indexOf(filter.toLowerCase().trim()) > -1 ||
-      // un appareil ?
-      recipe.appliance
-        .toLowerCase()
-        .trim()
-        .indexOf(filter.toLowerCase().trim()) > -1
-    ) {
-      googledCards.push(recipe);
-      //   console.log(cards);
-      continue;
-    }
-    // un ustensil ?
-    for (let ustensil of recipe.ustensils) {
-      if (
-        ustensil.toLowerCase().trim().indexOf(filter.toLowerCase().trim()) > -1
-      ) {
-        googledCards.push(recipe);
-        break;
-      }
-    }
-
-    // un ingredient ?
-    for (let ingredient of recipe.ingredients) {
-      if (
-        ingredient.ingredient
-          .toLowerCase()
-          .trim()
-          .indexOf(filter.toLowerCase().trim()) > -1
-      ) {
-        googledCards.push(recipe);
-        break;
-      }
-    }
-  }
-  //   console.log(cards);
-  return googledCards;
-};
-
-// LISTEN INPUT BARRE DE RECHERCHE
-export let IS_GOOGLE = (recipes) => {
-  const takeIt = document.querySelector(".search__input");
-
-  takeIt.addEventListener("input", () => {
-    // si le nbre de lettre dépasse 2 alors :  LANCER ALGO
-    if (takeIt.value.length > 2) {
-      //   console.log(takeIt.value);
-      const googledRecipes = theMillTurns(recipes, takeIt.value);
-      const googledRecipesDistinct = deleteDuplicatesGoogled(googledRecipes);
-      // console.log(googledRecipesDistinct);
-      cards.DISPLAY_CARDS(googledRecipesDistinct);
-      filters.DISPLAY_FILTERS(googledRecipesDistinct);
-      isFilterReload(recipes);
-    } else {
-      // SINON TABLEAU DES RECETTES
-      cards.DISPLAY_CARDS(recipes);
-      isFilterReload(recipes);
-      // ON VIDE LE TABLEAY DEStags
-      // console.log(tagsArray);
-      while (tagsArray.length > 0) {
-        tagsArray.pop();
-      }
-      // console.log(tagsArray);
-      showListOfTags(tagsArray);
-
-      document.querySelectorAll(".filter__custom-option").forEach((li) => {
-        li.classList.add("filter__custom-option");
-        li.classList.remove("filter__custom-option--enable");
-      });
-    }
-  });
-};
-
-// LISTEN FOREACH INPUT FILTER
-export let IS_TAGGED = (recipes) => {
-  // LISTEN INPUT BARRE DE RECHERCHE DU FILTRE
-  const takeFilter = document.querySelectorAll(".filter__select");
-
-  takeFilter.forEach((input) => {
-    input.addEventListener("input", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      // console.log(e);
-
-      // ON VIDE LE TABLEAU DES TAGS
-      while (tagsArray.length > 0) {
-        tagsArray.pop();
-      }
-      // console.log(tagsArray);
-      showListOfTags(tagsArray);
-      cards.DISPLAY_CARDS(recipes);
-
-      let value = input.getAttribute("data-value");
-      let color = input.getAttribute("data-color");
-
-      input.nextElementSibling.remove();
-
-      filters.DISPLAY_FILTERS(recipes, input, input.value, value, color);
-      input.parentNode.style.width = "66%";
-      input.setAttribute("placeholder", "Recherche un ingrédient");
-      input.nextElementSibling.classList.add("filter__show");
-      input.previousElementSibling.classList.add(
-        "filter__custom-arrow--rotate"
+// fonction globale
+// permet d'ouvrir et de fermer les filtres / btn
+export const isFiltersInteractive =
+  (renderRecipes.prototype.isFiltersInteractive = (btn, buttonValue) => {
+    // composant liste de mots clés
+    const displayKeyword = btn.nextElementSibling;
+    if (displayKeyword.classList.contains("filter__show")) {
+      closeSelectFilter(
+        // supprime le placeholder, attribue une value, attribue un type button
+        displayKeyword.previousElementSibling,
+        // supprime la class CSS assurant l'affichange
+        displayKeyword,
+        // réduit la largeur du composant
+        displayKeyword.parentNode,
+        // assure la rotation de la flèche vers le haut
+        displayKeyword.parentNode.firstElementChild
       );
-    });
+    } else {
+      // vérifie si les filtres sont ouverts ailleurs pour les fermer
+      isFilterClosed();
+      // ouvre le filtre sélectionné
+      changeInputTypeInText(btn, buttonValue);
+    }
   });
-};
+
+// ferme le menu sélectionné
+export const closeSelectFilter = (renderRecipes.prototype.closeSelectFilter = (
+  inputBtn,
+  filterShow,
+  parentWidth,
+  rotateArrow
+) => {
+  inputBtn.setAttribute("type", "button");
+  inputBtn.setAttribute("value", `${inputBtn.getAttribute("data-value")}`);
+  inputBtn.removeAttribute("placeholder");
+  filterShow.classList.remove("filter__show");
+  parentWidth.style.width = "170px";
+  rotateArrow.classList.remove("filter__custom-arrow--rotate");
+});
+
+// vérifie si les filtres sont ouverts ailleurs pour les fermer
+export const isFilterClosed = (renderRecipes.prototype.isFilterClosed = () => {
+  document.querySelectorAll(".filter__custom-menu").forEach((filter) => {
+    if (filter.classList.contains("filter__show")) {
+      closeSelectFilter(
+        // supprime le placeholder, attribue une value, attribue un type button
+        filter.previousElementSibling,
+        // supprime la class CSS assurant l'affichage
+        filter,
+        // réduit la largeur du composant
+        filter.parentNode,
+        // assure la rotation de la flèche vers le haut
+        filter.parentNode.firstElementChild
+      );
+    }
+  });
+});
+
+// FERME LE FILTRE ET CHARGE NOUVEAUX ELEMENTS
+export const isFilterReload = (renderRecipes.prototype.isFilterClosed = (
+  data
+) => {
+  document.querySelectorAll(".filter__custom-menu").forEach((filter) => {
+    if (filter.classList.contains("filter__show")) {
+      let btn = filter.previousElementSibling;
+      let btnvalue = btn.getAttribute("value");
+      // console.log(btn, btnvalue);
+
+      // SUPPRESSION DES PRECEDENTES UL CONTENANT LES LI
+      document.querySelectorAll(".filter__custom-menu").forEach((ul) => {
+        // console.log(ul);
+        ul.remove();
+      });
+      // HYDRATE LES LI AVEC LA NOUVELLE RECHERCHE
+      filters.DISPLAY_FILTERS(data);
+      // OUVRE A NOUVEAU L'INPUT EN MODE TEXTE
+      changeInputTypeInText(btn, btnvalue);
+    }
+  });
+});
+
+export const changeInputTypeInText =
+  (renderRecipes.prototype.changeInputTypeInText = (button, buttonValue) => {
+    button.setAttribute("type", "text");
+    button.setAttribute("data-value", `${buttonValue}`);
+    // button.removeAttribute("value");
+    button.value = "";
+
+    switch (buttonValue) {
+      case "Appareil":
+        // élargie le button type texte
+        button.parentNode.style.width = "66%";
+        // set un placeholder
+        button.setAttribute("placeholder", "Recherche un appareil");
+        // affiche la liste
+        button.nextElementSibling.classList.add("filter__show");
+        // rotate de la fleche
+        button.previousElementSibling.classList.add(
+          "filter__custom-arrow--rotate"
+        );
+
+        break;
+      case "Ingrédients":
+        button.parentNode.style.width = "66%";
+        button.setAttribute("placeholder", "Recherche un ingrédient");
+        button.nextElementSibling.classList.add("filter__show");
+        button.previousElementSibling.classList.add(
+          "filter__custom-arrow--rotate"
+        );
+
+        break;
+      case "Ustensiles":
+        button.parentNode.style.width = "66%";
+        button.setAttribute("placeholder", "Recherche un ustensile");
+        button.nextElementSibling.classList.add("filter__show");
+        button.previousElementSibling.classList.add(
+          "filter__custom-arrow--rotate"
+        );
+
+        break;
+      default:
+        break;
+    }
+  });
