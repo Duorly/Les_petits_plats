@@ -1,169 +1,66 @@
-// console.log("%c displayFilters.js", "color: green; font-weight:bold;");
-
 import { renderRecipes } from "./api.js";
-import * as utils from "./utils.js";
-import { listenFilter } from "./displayTags.js";
+import { capitalize } from "./utils.js";
 
-// NEW SET : distinct INGREDIENTS
-export const displayFilterIngredients =
-  (renderRecipes.prototype.displayFilterIngredients = function (data, filter) {
-    // console.log(data, filter);
-
-    const distinctIngredients = [
-      ...new Set(
-        data
-          .map((recipe) =>
-            recipe.ingredients.map((ingredient) =>
-              ingredient.ingredient.toLowerCase().trim()
-            )
-          )
-          .flat()
-          .sort()
-      ),
-    ];
-
-    // SI RECHERCHE DANS INPUT....
-    if (filter) {
-      // console.log(
-      //   distinctIngredients.filter((ingredient) =>
-      //     ingredient.includes(filter.toLowerCase().trim())
-      //   )
-      // );
-      return distinctIngredients.filter((ingredient) =>
-        ingredient.includes(filter.toLowerCase().trim())
-      );
-    }
-    // SANS RECHERCHE
-    return utils.shuffle(distinctIngredients);
-  });
-
-// NEW SET : distinct APPLIANCE
-export const displayFilterAppliance =
-  (renderRecipes.prototype.displayFilterAppliance = function (data, filter) {
-    // console.log(data);
-    const distinctAppliance = [
-      ...new Set(
-        data.map((recipe) => recipe.appliance.toLowerCase().trim()).sort()
-      ),
-    ];
-
-    // SI RECHERCHE DANS INPUT....
-    if (filter) {
-      return distinctAppliance.filter((appliance) =>
-        appliance.includes(filter.toLowerCase().trim())
-      );
-    }
-    // SANS RECHERCHE
-    // console.log(distinctAppliance);
-    return distinctAppliance;
-  });
-
-// NEW SET : distinct USTENSILS
-export const displayFilterUstensils =
-  (renderRecipes.prototype.displayFilterUstensils = function (data, filter) {
-    // console.log(data);
-    const distinctUstensils = [
-      ...new Set(
-        data
-          .map((recipe) =>
-            recipe.ustensils.map((item) => item.toLowerCase().trim())
-          )
-          .flat()
-          .sort()
-      ),
-    ];
-    // SI RECHERCHE DANS INPUT....
-    if (filter) {
-      return distinctUstensils.filter((ustensil) =>
-        ustensil.includes(filter.toLowerCase().trim())
-      );
-    }
-    // SANS RECHERCHE
-    return distinctUstensils;
-  });
-
-// HYDRATE HTML DANS LES FILTRES
-const list_HTML = (renderRecipes.prototype.getList_HTML = (
-  distinctData,
-  datacolor
-) => {
-  // console.log(distinctData, datacolor);
-  let li_HTML = "";
-  distinctData.map((setLi) => {
-    li_HTML += `<li class="filter__custom-option" data-color="${datacolor}">${utils.capitalize(
-      setLi
-    )}</li>`;
-  });
-  // console.log(li_HTML);
-  return li_HTML;
-});
-
-// TEST CONDITIONNEL POUR ROUTER HTML
-export const hydrateFilter = (renderRecipes.prototype.hydrateFilter = function (
-  data,
-  value,
-  btn,
-  datacolor,
-  filter
+// CARDS COMPONENT
+export const DISPLAY_CARDS = (renderRecipes.prototype.displayCards = function (
+  recipes
 ) {
-  // console.log(value);
-  // console.log(data, value, btn, filter);
-  switch (value) {
-    case "Ingrédients":
-      // console.log(data, filter);
-      btn.insertAdjacentHTML(
-        "afterend",
-        `
-        <ul class="filter__custom-menu filter__custom-menu--primary">
-      ${list_HTML(displayFilterIngredients(data, filter), datacolor)}
-      </ul>`
-      );
-      break;
-    case "Appareil":
-      btn.insertAdjacentHTML(
-        "afterend",
-        `
-        <ul class="filter__custom-menu filter__custom-menu--success">
-      ${list_HTML(displayFilterAppliance(data, filter), datacolor)}
-      </ul>`
-      );
-      break;
-    case "Ustensiles":
-      btn.insertAdjacentHTML(
-        "afterend",
-        `
-        <ul class="filter__custom-menu filter__custom-menu--danger">
-      ${list_HTML(displayFilterUstensils(data, filter), datacolor)}
-      </ul>`
-      );
-      break;
-    default:
-      break;
+  const cards = document.querySelector(".cards");
+  cards.innerHTML = "";
+  if (recipes == 0 && !document.querySelector(".cards__no-recipes")) {
+    return cards.insertAdjacentHTML(
+      "beforebegin",
+      `<div class="cards__no-recipes">
+      <p class="cards__no-recipes-text">Aucune recette ne correspond à votre critère… </p>
+  </div>`
+    );
+  } else {
+    // to remove the message
+    if (document.querySelector(".cards__no-recipes") && recipes != 0) {
+      document.querySelector(".cards__no-recipes").remove();
+    }
   }
-});
 
-// FONCTION GLOBALE
-export const DISPLAY_FILTERS = (renderRecipes.displayFilters = function (
-  data,
-  btn,
-  filter,
-  value,
-  color
-) {
-  if (btn && filter && value && color) {
-    // console.log(data, btn, filter, value, color);
-    hydrateFilter(data, value, btn, color, filter);
-  } else if (data) {
-    document.querySelectorAll(".filter__select").forEach((button) => {
-      let value = button.getAttribute("value");
-      // console.log(value, button);
-      let datacolor = button.getAttribute("data-color");
+  recipes.forEach((recipe) => {
+    // console.log(recipe);
+    let listCard_HTML = "";
 
-      // console.log(data, value, button, datacolor);
-      hydrateFilter(data, value, button, datacolor);
+    recipe.ingredients.map((elt) => {
+      listCard_HTML += `<li class="card__ingredient">
+          <span class="card__ingredient--bold">${
+            elt.ingredient ? capitalize(elt.ingredient).trim() : ""
+          }</span>  ${elt.quantity ? elt.quantity.toString().trim() : ""} ${
+        elt.unit ? elt.unit.toLowerCase().trim() : ""
+      }
+         </li>`;
+
+      return listCard_HTML;
     });
-  }
 
-  // ECOUTE L'ENSEMBLE DES LI (textcontent et color)
-  listenFilter(data, document.querySelectorAll(".filter__custom-option"));
+    document.querySelector(".cards").insertAdjacentHTML(
+      "afterbegin",
+      `<article class="card">
+        <a href="#">
+        <div class="card__thumb"></div>
+        <div class="card__body">
+        <div class="card__head">
+        <h2 class="card__title">${capitalize(recipe?.name.trim())}</h2>
+        <div class="card__time">
+        <i class="card__timeclock"></i>
+        <p class="card__minutes">${recipe?.time.toString().trim()} min</p>
+        </div>
+        </div>
+        <div class="card__content">
+        <ul class="card__ingredients">
+                        ${listCard_HTML}
+                        </ul>
+                        <p class="card__description">
+                        ${recipe?.description.trim()}
+                        </p>
+                      </div>
+                      </div>
+                  </a>
+                </article>`
+    );
+  });
 });
