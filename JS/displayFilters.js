@@ -4,71 +4,48 @@ import { renderRecipes } from "./api.js";
 import * as utils from "./utils.js";
 import { listenFilter } from "./displayTags.js";
 
-var distinctIngredients = [];
-var distinctAppliance = [];
-var distinctUstensils = [];
-// NEW DATA ARRAY : distinct INGREDIENTS
+// NEW SET : distinct INGREDIENTS
 export const displayFilterIngredients =
   (renderRecipes.prototype.displayFilterIngredients = function (data, filter) {
-    for (const recipe of data) {
-      // console.log(recipe);
-      for (const ingredient of recipe.ingredients) {
-        let currentIngredient = ingredient.ingredient.toLowerCase().trim();
-        // console.log(currentIngredient);
-        if (distinctIngredients.length === 0) {
-          distinctIngredients.push(currentIngredient);
-          // console.log(ingredients);
-        } else {
-          let isIn = false;
-          for (const itemInIngredients of distinctIngredients) {
-            // console.log(itemInIngredients);
-            if (itemInIngredients === currentIngredient) {
-              isIn = true;
-            }
-          }
-          if (!isIn) {
-            distinctIngredients.push(currentIngredient);
-          }
-        }
-      }
-    }
+    // console.log(data, filter);
+
+    const distinctIngredients = [
+      ...new Set(
+        data
+          .map((recipe) =>
+            recipe.ingredients.map((ingredient) =>
+              ingredient.ingredient.toLowerCase().trim()
+            )
+          )
+          .flat()
+          .sort()
+      ),
+    ];
 
     // SI RECHERCHE DANS INPUT....
     if (filter) {
+      // console.log(
+      //   distinctIngredients.filter((ingredient) =>
+      //     ingredient.includes(filter.toLowerCase().trim())
+      //   )
+      // );
       return distinctIngredients.filter((ingredient) =>
         ingredient.includes(filter.toLowerCase().trim())
       );
     }
     // SANS RECHERCHE
-    return distinctIngredients;
+    return utils.shuffle(distinctIngredients);
   });
 
 // NEW SET : distinct APPLIANCE
 export const displayFilterAppliance =
   (renderRecipes.prototype.displayFilterAppliance = function (data, filter) {
-    for (const recipe of data) {
-      // console.log(recipe);
-      // for (const appliance of recipe) {
-      // console.log(recipe.appliance);
-      let currentAppliance = recipe.appliance.toLowerCase().trim();
-      // console.log(currentAppliance);
-      if (distinctAppliance.length === 0) {
-        distinctAppliance.push(currentAppliance);
-        // console.log(distinctAppliance);
-      } else {
-        let isIn = false;
-        for (const itemInAppliance of distinctAppliance) {
-          // console.log(itemInIngredients);
-          if (itemInAppliance === currentAppliance) {
-            isIn = true;
-          }
-        }
-        if (!isIn) {
-          distinctAppliance.push(currentAppliance);
-        }
-      }
-      // }
-    }
+    // console.log(data);
+    const distinctAppliance = [
+      ...new Set(
+        data.map((recipe) => recipe.appliance.toLowerCase().trim()).sort()
+      ),
+    ];
 
     // SI RECHERCHE DANS INPUT....
     if (filter) {
@@ -77,35 +54,24 @@ export const displayFilterAppliance =
       );
     }
     // SANS RECHERCHE
+    // console.log(distinctAppliance);
     return distinctAppliance;
   });
 
 // NEW SET : distinct USTENSILS
 export const displayFilterUstensils =
   (renderRecipes.prototype.displayFilterUstensils = function (data, filter) {
-    for (const recipe of data) {
-      // console.log(recipe);
-      for (const ustensil of recipe.ustensils) {
-        let currentUstensil = ustensil.toLowerCase().trim();
-        // console.log(currentUstensil);
-        if (distinctUstensils.length === 0) {
-          distinctUstensils.push(currentUstensil);
-          // console.log(ustensil);
-        } else {
-          let isIn = false;
-          for (const itemInUstensils of distinctUstensils) {
-            // console.log(itemInUstensils);
-            if (itemInUstensils === currentUstensil) {
-              isIn = true;
-            }
-          }
-          if (!isIn) {
-            distinctUstensils.push(currentUstensil);
-          }
-        }
-      }
-    }
-
+    // console.log(data);
+    const distinctUstensils = [
+      ...new Set(
+        data
+          .map((recipe) =>
+            recipe.ustensils.map((item) => item.toLowerCase().trim())
+          )
+          .flat()
+          .sort()
+      ),
+    ];
     // SI RECHERCHE DANS INPUT....
     if (filter) {
       return distinctUstensils.filter((ustensil) =>
