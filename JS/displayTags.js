@@ -33,6 +33,7 @@ const tagIsNone = (e) => {
   if (tagsArray.length === 0) {
     // console.log("zero");
     // console.log(originalRecipes[0]);
+    document.querySelector(".search__input").value = '';
     DISPLAY_CARDS(originalRecipes[0]);
     isFilterReload(originalRecipes[0]);
   } else if (tagsArray.length >= 1) {
