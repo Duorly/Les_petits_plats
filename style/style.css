@@ -9,6 +9,7 @@
   --fs-12: 12px;
   --br-5: 5px;
 }
+
 @import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@400;500;600;700;800&display=swap');
 
 body {
@@ -64,7 +65,6 @@ body {
   right: 8px;
   top: 0;
   height: 100%;
-  cursor: pointer;
 }
 
 /* tags section */
@@ -124,7 +124,6 @@ body {
 .filter__select {
   border: none;
   color: #fff;
-  opacity: 1;
   width: 100%;
   height: 69px;
   text-align: start;
@@ -210,7 +209,7 @@ body {
   width: 33%;
   padding: 4px 0 4px 20px;
   font-size: var(--fs-18);
-  /* color: rgb(165, 162, 162); */
+  color: rgb(165, 162, 162);
   display: none;
   pointer-events: none;
 }
@@ -312,7 +311,6 @@ body {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 16px;
 }
 
 .card__timeclock {
